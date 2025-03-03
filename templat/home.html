@@ -15,8 +15,10 @@
             <h1>TradeWave <span>AI</span></h1>
             <div class="header-right">
                 <div class="user-profile">
-                    <img src="/api/placeholder/40/40" alt="User Avatar">
-                    <span>John Doe</span>
+                    <img src="{% static 'images/profile.jpg' %}" alt="User Avatar" id="profile-img">
+                    <div class="dropdown-menu" id="dropdown-menu">
+                        <a href="{% url 'logout' %}">Logout</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -249,5 +251,6 @@
             document.getElementById('totalValue').value = '$' + totalValue;
         }
     </script>
+    <script src="{% static 'js/home.js' %}"></script>
 </body>
 </html>

@@ -298,3 +298,38 @@ button i {
     color: white;
     border-color: #1a73e8;
 }
+.user-profile {
+    position: relative;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.user-profile img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    display: none;
+    min-width: 120px;
+    text-align: center;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: #333;
+}
+
+.dropdown-menu a:hover {
+    background: #f1f1f1;
+}
