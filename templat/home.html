@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeWave AI - Stock Market</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 30px;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .header span {
+            font-weight: 300;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+        }
+        
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .market-summary {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+        
+        .summary-card {
+            flex: 1;
+            background: white;
+            margin: 0 10px;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        
+        .summary-card .value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .summary-card .change {
+            display: block;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        
+        .market-data {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+        
+        .stock-table, .trade-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            flex: 1;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .stock-table:hover, .trade-section:hover {
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .section-header h2 {
+            font-size: 22px;
+            color: #333;
+        }
+        
+        .section-header .refresh {
+            color: #1a73e8;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 15px 10px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            color: #555;
+            font-weight: 600;
+        }
+        
+        tr {
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s ease;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .stock-name {
+            display: flex;
+            align-items: center;
+        }
+        
+        .stock-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            color: #1a73e8;
+            font-size: 14px;
+        }
+        
+        .positive {
+            color: #00c853;
+        }
+        
+        .negative {
+            color: #f44336;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        select:focus, input:focus {
+            border-color: #1a73e8;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+        
+        .buy-sell {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .buy-btn { 
+            background: #00c853; 
+        }
+        
+        .buy-btn:hover { 
+            background: #00a844;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 200, 83, 0.3);
+        }
+        
+        .sell-btn { 
+            background: #f44336; 
+        }
+        
+        .sell-btn:hover { 
+            background: #d32f2f;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);
+        }
+        
+        button i {
+            margin-right: 8px;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .chart-container:hover {
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .chart-wrapper {
+            height: 400px;
+            position: relative;
+        }
+        
+        .time-filter {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .time-btn {
+            padding: 8px 20px;
+            background: transparent;
+            color: #555;
+            border: 1px solid #ddd;
+            margin: 0 5px;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        
+        .time-btn.active {
+            background: #1a73e8;
+            color: white;
+            border-color: #1a73e8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>TradeWave <span>AI</span></h1>
+            <div class="header-right">
+                <div class="user-profile">
+                    <img src="/api/placeholder/40/40" alt="User Avatar">
+                    <span>John Doe</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="market-summary">
+            <div class="summary-card">
+                <h3>S&P 500</h3>
+                <div class="value">4,536.95</div>
+                <span class="change positive">+1.23% <i class="fas fa-caret-up"></i></span>
+            </div>
+            <div class="summary-card">
+                <h3>NASDAQ</h3>
+                <div class="value">15,129.50</div>
+                <span class="change positive">+1.73% <i class="fas fa-caret-up"></i></span>
+            </div>
+            <div class="summary-card">
+                <h3>DOW JONES</h3>
+                <div class="value">35,677.02</div>
+                <span class="change negative">-0.42% <i class="fas fa-caret-down"></i></span>
+            </div>
+            <div class="summary-card">
+                <h3>Portfolio Value</h3>
+                <div class="value">$14,258.67</div>
+                <span class="change positive">+3.5% <i class="fas fa-caret-up"></i></span>
+            </div>
+        </div>
+        
+        <div class="market-data">
+            <div class="stock-table">
+                <div class="section-header">
+                    <h2>Watchlist Stocks</h2>
+                    <i class="fas fa-sync-alt refresh"></i>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Stock</th>
+                            <th>Price</th>
+                            <th>Change %</th>
+                            <th>Volume</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="stock-name">
+                                    <div class="stock-icon">A</div>
+                                    Apple (AAPL)
+                                </div>
+                            </td>
+                            <td>$145.30</td>
+                            <td class="positive">+1.5% <i class="fas fa-caret-up"></i></td>
+                            <td>5.3M</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="stock-name">
+                                    <div class="stock-icon">A</div>
+                                    Amazon (AMZN)
+                                </div>
+                            </td>
+                            <td>$3,210.20</td>
+                            <td class="negative">-0.8% <i class="fas fa-caret-down"></i></td>
+                            <td>3.1M</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="stock-name">
+                                    <div class="stock-icon">G</div>
+                                    Google (GOOGL)
+                                </div>
+                            </td>
+                            <td>$2,750.50</td>
+                            <td class="positive">+2.1% <i class="fas fa-caret-up"></i></td>
+                            <td>2.5M</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="stock-name">
+                                    <div class="stock-icon">T</div>
+                                    Tesla (TSLA)
+                                </div>
+                            </td>
+                            <td>$843.03</td>
+                            <td class="positive">+3.2% <i class="fas fa-caret-up"></i></td>
+                            <td>12.7M</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="trade-section">
+                <div class="section-header">
+                    <h2>Trade</h2>
+                </div>
+                <div class="form-group">
+                    <label for="stock">Select Stock:</label>
+                    <select id="stock">
+                        <option value="AAPL">Apple (AAPL)</option>
+                        <option value="AMZN">Amazon (AMZN)</option>
+                        <option value="GOOGL">Google (GOOGL)</option>
+                        <option value="TSLA">Tesla (TSLA)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" id="quantity" min="1" value="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="price">Market Price:</label>
+                    <input type="text" id="price" value="$145.30" disabled>
+                </div>
+                
+                <div class="form-group">
+                    <label for="totalValue">Total Value:</label>
+                    <input type="text" id="totalValue" value="$145.30" disabled>
+                </div>
+                
+                <div class="buy-sell">
+                    <button class="buy-btn"><i class="fas fa-shopping-cart"></i> Buy</button>
+                    <button class="sell-btn"><i class="fas fa-tag"></i> Sell</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="section-header">
+                <h2>Stock Performance</h2>
+                <i class="fas fa-sync-alt refresh"></i>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="stockChart"></canvas>
+            </div>
+            <div class="time-filter">
+                <button class="time-btn">1D</button>
+                <button class="time-btn active">1W</button>
+                <button class="time-btn">1M</button>
+                <button class="time-btn">3M</button>
+                <button class="time-btn">1Y</button>
+                <button class="time-btn">YTD</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Set up the chart
+        var ctx = document.getElementById('stockChart').getContext('2d');
+        var stockChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Mon', 'Tue'],
+                datasets: [{
+                    label: 'AAPL',
+                    data: [142, 145, 146, 144, 147, 145, 148],
+                    borderColor: '#1a73e8',
+                    backgroundColor: 'rgba(26, 115, 232, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    pointBackgroundColor: 'white',
+                    pointBorderColor: '#1a73e8',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                        padding: 10,
+                        caretSize: 6,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return '$' + context.raw;
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                }
+            }
+        });
+
+        // Simple script to calculate total value
+        document.getElementById('quantity').addEventListener('input', updateTotalValue);
+        document.getElementById('stock').addEventListener('change', updateMarketPrice);
+
+        function updateMarketPrice() {
+            const stockPrices = {
+                'AAPL': 145.30,
+                'AMZN': 3210.20,
+                'GOOGL': 2750.50,
+                'TSLA': 843.03
+            };
+            
+            const selectedStock = document.getElementById('stock').value;
+            const price = stockPrices[selectedStock];
+            document.getElementById('price').value = '$' + price.toFixed(2);
+            updateTotalValue();
+        }
+
+        function updateTotalValue() {
+            const quantity = document.getElementById('quantity').value;
+            const price = parseFloat(document.getElementById('price').value.slice(1));
+            const totalValue = (quantity * price).toFixed(2);
+            document.getElementById('totalValue').value = '$' + totalValue;
+        }
+    </script>
+</body>
+</html>

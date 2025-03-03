@@ -3,9 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>TradeWave AI - Automate Your Stock Trading</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background-color: #0d1117;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 1.2rem;
+            color: #bbb;
+        }
+        .btn {
+            margin-top: 20px;
+            display: inline-block;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            color: white;
+            background-color: #0084ff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background-color: #005ecb;
+        }
+    </style>
 </head>
 <body>
-    
+    <div class="container">
+        <h1>TradeWave AI</h1>
+        <p>The future of automated stock trading is here. Maximize profits with AI-driven insights.</p>
+        <a href="{% url 'login' %}" class="btn">Trade Now</a>
+    </div>
 </body>
 </html>
