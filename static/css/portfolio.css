@@ -1,0 +1,157 @@
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+    color: #333;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* Navigation Bar */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 30px;
+    background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+    color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+}
+
+.header h1 {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-item {
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+    transition: color 0.3s;
+    text-decoration: none;
+}
+
+.nav-item:hover {
+    color: #ece6e4;
+}
+
+.user-profile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.user-profile img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    display: none;
+    min-width: 120px;
+    text-align: center;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: #333;
+}
+
+.dropdown-menu a:hover {
+    background: #f1f1f1;
+}
+
+/* Main Content */
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.wallet-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: #1a73e8;
+    color: white;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+.wallet-balance {
+    font-size: 18px;
+}
+.add-balance {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.add-balance input {
+    width: 80px;
+    padding: 5px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+}
+.add-balance button {
+    padding: 7px 12px;
+    background-color: #ffcc00;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+.portfolio-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+.portfolio-table th, .portfolio-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+.portfolio-table th {
+    background-color: #1a73e8;
+    color: white;
+}
+.chart-container {
+    width: 100%;
+    height: 250px; /* Small graph */
+    margin-top: 20px;
+}

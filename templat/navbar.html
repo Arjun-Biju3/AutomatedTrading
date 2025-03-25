@@ -1,0 +1,19 @@
+{% load static %}
+<div class="header">
+    <h1>TradeWave <span>AI</span></h1>
+    <div class="header-right">
+        <nav class="nav-links">
+            <a href="{% url 'home' %}"><p class="nav-item">HOME</p></a>
+            <a href="{% url 'stocks' %}"><p class="nav-item">ALL STOCKS</p></a>
+            <a href="{% url 'portfolio' %}"><p class="nav-item">MY PORTFOLIO</p></a>
+        </nav>
+        <div class="user-profile">
+            <img src="{% static 'images/profile.jpg' %}" alt="User Avatar" id="profile-img">
+            <div class="dropdown-menu" id="dropdown-menu">
+                <a href="{% url 'logout' %}">Logout</a>
+                <hr>
+                <a href="#">Profile</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,4 +1,3 @@
-
 * {
     margin: 0;
     padding: 0;
@@ -247,6 +246,7 @@ button {
 .sell-btn { 
     background: #f44336; 
 }
+
 
 .sell-btn:hover { 
     background: #d32f2f;

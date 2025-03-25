@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Funds - TradeWave AI</title>
+    <link rel="stylesheet" href="{% static 'css/add_fund.css' %}">
+    
+</head>
+<body>
+
+    <div class="container">
+        <h2>Add Funds</h2>
+
+        <form id="addFundsForm" method="POST" action="{% url 'add_funds' %}">
+            {% csrf_token %}
+            
+            <label for="amount">Enter Amount:</label>
+            <input type="number" id="amount" name="amount" min="1" required>
+
+            <label for="card_number">Card Number:</label>
+            <input type="text" id="card_number" name="card_number" maxlength="16" required>
+
+            <label for="expiry">Expiry Date (MM/YY):</label>
+            <input type="text" id="expiry" name="expiry" placeholder="MM/YY" required>
+
+            <label for="cvv">CVV:</label>
+            <input type="text" id="cvv" name="cvv" maxlength="3" required>
+
+            <button type="submit" class="btn">Add Funds</button>
+        </form>
+
+        <p class="error" id="errorMessage"></p>
+    </div>
+
+    <script src="{% static 'js/add_fund.js' %}"></script>
+</body>
+</html>

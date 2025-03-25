@@ -1,0 +1,63 @@
+{% extends 'blank_layout.html' %}
+{% block content %}
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Portfolio</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{% static 'css/portfolio.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Main Content Container -->
+    <div class="container">
+        <!-- Wallet Section -->
+        <div class="wallet-section">
+            <div class="wallet-balance">Wallet Balance: <span id="walletBalance">{{ balance }}</span></div>
+            <div class="add-balance">
+                <a href="{% url 'add_funds' %}"><button>Add Funds</button></a>
+            </div>
+        </div>
+
+        <!-- Portfolio Table -->
+        <table class="portfolio-table">
+            <thead>
+                <tr>
+                    <th>Stock</th>
+                    <th>Shares</th>
+                    <th>Buy Price</th>
+                    <th>Current Price</th>
+                    <th>Total Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if stocks %}
+                    {% for stock in stocks %}
+                    <tr>
+                        <td>{{ stock.stock.name }}</td>
+                        <td>{{ stock.quantity }}</td>
+                        <td>{{ stock.buy_price }}</td>
+                        <td>{{ stock.stock.current_price }}</td>
+                        <td>{{ stock.quantity|multiply:stock.buy_price|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="5">No stocks in portfolio.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <script src="{% static 'js/portfolio.js' %}"></script>
+
+</body>
+</html>
+
+{% endblock content %}

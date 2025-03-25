@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validate OTP</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.2);
+            width: 350px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input:focus {
+            border-color: #182dcc;
+            outline: none;
+        }
+
+        .btn {
+            background-color: #182dcc;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn:hover {
+            background-color: #0a1aa3;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Validate OTP</h2>
+
+        <div class="message-container" id="message-container">
+            {% if messages %}
+                {% for message in messages %}
+                    {% if "error" in message.tags %}
+                        <p style="color: red;">{{ message }}</p>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+
+
+
+        <form id="otp-form" method="POST">
+            {% csrf_token %}
+            <label for="otp">Enter OTP:</label>
+            <input type="text" id="otp" name="otp" maxlength="6" >
+            <p id="error-message" class="error-message"></p>
+
+            <button type="submit"  class="btn">SUBMIT</button>
+            <button type="submit" name="resend" class="btn" id="resend-btn">RESEND</button>
+        </form>
+    </div>
+
+
+</body>
+</html>

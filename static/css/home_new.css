@@ -1,0 +1,78 @@
+.market-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Space between rows */
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.summary-card {
+    width: 23%; /* 4 items per row */
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.summary-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.sech-btn { 
+    background: #182dcc; 
+}
+
+.sech-btn:hover { 
+    background: #0606ea;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);
+}
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-item {
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+    transition: color 0.3s;
+}
+
+.nav-item:hover {
+    color: #ece6e4;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+}
+
+#profile-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+a {
+    text-decoration: none;
+    color: inherit;
+}
+

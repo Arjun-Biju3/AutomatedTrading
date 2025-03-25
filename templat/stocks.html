@@ -1,0 +1,60 @@
+{% extends 'blank_layout.html' %}
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Stocks - TradeWave AI</title>
+    <link rel="stylesheet" href="{% static 'css/stocks.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+   
+</head>
+<body>
+
+    <div class="container">
+        <!-- Stock List Section -->
+        <div class="stock-table">
+            <div class="section-header">
+                <h2>All Stocks</h2>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Stock Name</th>
+                        <th>Symbol</th>
+                        <th>Current Price</th>
+                        <th>Change %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stock in stocks %}
+                    <tr>
+                        <td class="stock-name">
+                            <div class="stock-icon"><i class="fas fa-chart-line"></i></div>
+                           <a href="{% url 'stock_details' stock.id  %}">{{ stock.name }}</a>
+                        </td>
+                        <td>{{ stock.symbol }}</td>
+                        <td>${{ stock.current_price }}</td>
+                        <td class="{% if stock.percent_change >= 0 %}positive{% else %}negative{% endif %}">
+                            {{ stock.percent_change }}%
+                            <i class="fas {% if stock.percent_change >= 0 %}fa-caret-up{% else %}fa-caret-down{% endif %}"></i>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align: center;">No stocks available.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+    <script src="{% static 'js/home.js' %}"></script>
+
+</body>
+</html>
+
+{% endblock content %}

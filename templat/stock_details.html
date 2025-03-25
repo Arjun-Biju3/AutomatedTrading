@@ -1,0 +1,132 @@
+{% extends 'blank_layout.html' %}
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ stock.name }} - Stock Details</title>
+    <link rel="stylesheet" href="{% static 'css/details.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Style for the quantity input box */
+.action-buttons label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.action-buttons input[type="number"] {
+    width: 60px; /* Small width */
+    height: 30px; /* Small height */
+    padding: 3px 5px;
+    font-size: 14px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    margin-right: 10px;
+}
+
+/* Ensure input is visually aligned with buttons */
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Improve button styles */
+.buy-btn, .sell-btn, .schedule-btn {
+    padding: 8px 15px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+/* Button colors */
+.buy-btn { background-color: #28a745; color: white; }
+.sell-btn { background-color: #dc3545; color: white; }
+.schedule-btn { background-color: #007bff; color: white; }
+
+.buy-btn:hover { background-color: #218838; }
+.sell-btn:hover { background-color: #c82333; }
+.schedule-btn:hover { background-color: #0056b3; }
+
+    </style>
+</head>
+<body>
+</body>
+
+{% if messages %}
+    <script>
+        {% for message in messages %}
+            alert("{{ message }}");
+        {% endfor %}
+    </script>
+{% endif %}
+
+</html>
+
+
+    <div class="container">
+        <div class="stock-details">
+            <div class="stock-info">
+                <div>
+                    <h2>{{ stock.name }} ({{ stock.symbol }})</h2>
+                    <p>Current Price: <strong>{{ stock.current_price }}</strong></p>
+                    <p>Change: 
+                        <strong class="{% if stock.percent_change >= 0 %}positive{% else %}negative{% endif %}">
+                            {{ stock.percent_change }}%
+                            <i class="fas {% if stock.percent_change >= 0 %}fa-caret-up{% else %}fa-caret-down{% endif %}"></i>
+                        </strong>
+                    </p>
+                </div>
+                <div>
+                    <p>Market Cap: <strong>{{ stock.market_cap }}</strong></p>
+                    <p>52-Week High: <strong>{{ stock.high_52 }}</strong></p>
+                    <p>52-Week Low: <strong>{{ stock.low_52 }}</strong></p>
+                    <p>Volume: <strong>{{ stock.volume }}</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dummy Chart -->
+        <div class="chart-container">
+            <h2>Stock Price Trend</h2>
+            <div class="chart-wrapper">
+                <canvas id="stockChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Buy, Sell, Schedule Form -->
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="action-buttons">
+                <input type="hidden" name="id" value="{{ stock.id }}">
+
+                <!-- Quantity Selection -->
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" name="quantity" min="1" max="{{ stock.volume }}" value="1" required>
+
+                <!-- Buy Button -->
+                <button type="submit" name="buy" class="buy-btn">
+                    <i class="fas fa-shopping-cart"></i> Buy
+                </button>
+
+                <!-- Schedule Button -->
+                <button type="submit" name="schedule" class="schedule-btn">
+                    <i class="fas fa-clock"></i> Schedule
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Chart Script -->
+    <script src="{% static 'js/details.js' %}"></script>
+    <script src="{% static 'js/home.js' %}"></script>
+</body>
+</html>
+
+{% endblock content %}
