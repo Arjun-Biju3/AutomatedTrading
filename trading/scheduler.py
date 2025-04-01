@@ -1,6 +1,5 @@
 import random
 import logging
-from decimal import Decimal  # Import Decimal to handle precise calculations
 from apscheduler.schedulers.background import BackgroundScheduler
 from django.utils.timezone import now
 from django.db import connections
@@ -22,15 +21,12 @@ def update_stock_prices():
 
         stocks = Stock.objects.all()
         for stock in stocks:
-            # Convert percent change to Decimal
-            percent_change = Decimal(round(random.uniform(-5, 5), 2))
-            # Calculate new price using Decimal for precision
-            multiplier = Decimal(1) + (percent_change / Decimal(100))
-            new_price = (stock.current_price * multiplier).quantize(Decimal("0.01"))  # Ensure Decimal precision
+            percent_change = round(random.uniform(-5, 5), 2)
+            new_price = round(stock.current_price * (1 + percent_change / 100), 2)
 
             # Prevent negative prices
             stock.percent_change = percent_change
-            stock.current_price = max(Decimal("1.00"), new_price)
+            stock.current_price = max(1, new_price)
             stock.last_updated = now()
             stock.save()
         
