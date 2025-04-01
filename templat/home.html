@@ -46,39 +46,48 @@
                     <tr>
                         <td>
                             <a href="{% url 'stock_details' watch.id  %}">
-                            <div class="stock-name">
-                                <div class="stock-icon">{{ watch.name|first }}</div>
-                                {{ watch.name}}{{ watch.symbol}}
-                            </div>
-                        </a>
+                                <div class="stock-name">
+                                    <div class="stock-icon">{{ watch.name|first }}</div>
+                                    {{ watch.name}}{{ watch.symbol}}
+                                </div>
+                            </a>
                         </td>
-                        <td>{{ watch.current_price}}</td>
-                        <td class="positive">{{ watch.percent_change}}% <i class="fas fa-caret-up"></i></td>
+                        <td>{{ watch.current_price }}</td>
+                        <td class="{% if watch.percent_change > 0 %}positive{% else %}negative{% endif %}">
+                            {{ watch.percent_change }}% 
+                            {% if watch.percent_change > 0 %}
+                                <i class="fas fa-caret-up" style="color: green;"></i>
+                            {% elif watch.percent_change < 0 %}
+                                <i class="fas fa-caret-down" style="color: red;"></i>
+                            {% else %}
+                                <i class="fas fa-minus" style="color: gray;"></i>
+                            {% endif %}
+                        </td>
                     </tr>
-                    
                     {% endfor %}
-                   
                 </tbody>
             </table>
+            
         </div>
         
         <div class="trade-section">
             <div class="section-header">
                 <h2>Trade</h2>
             </div>
-        
+        <form action="{% url 'buy_stock' %}" method="post">
+            {% csrf_token %}
             <div class="form-group">
                 <label for="stock">Select Stock:</label>
-                <select id="stock">
+                <select id="stock" name="stock">
                     {% for stock in all %}
-                    <option value="{{ stock.current_price }}" data-price="{{ stock.current_price }}">{{ stock.name }}</option>
+                    <option value="{{ stock.id }}" data-price="{{ stock.current_price }}">{{ stock.name }}</option>
                     {% endfor %}
                 </select>
             </div>
         
             <div class="form-group">
                 <label for="quantity">Quantity:</label>
-                <input type="number" id="quantity" min="1" value="1">
+                <input type="number" name="quantity" id="quantity" min="1" value="1">
             </div>
         
             <div class="form-group">
@@ -92,9 +101,10 @@
             </div>
         
             <div class="buy-sell">
-                <button class="buy-btn"><i class="fas fa-shopping-cart"></i> Buy</button>
-                <button class="sech-btn"><i class=""></i> Schedule</button>
+                <button type="submit" name="buy" class="buy-btn"><i class="fas fa-shopping-cart"></i> Buy</button>
+                <button  class="sech-btn"><i class=""></i> Schedule</button>
             </div>
+        </form>
         </div>
         
     </div>

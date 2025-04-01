@@ -5,6 +5,9 @@ from django.contrib.auth.models import User
 from trading.models import *
 from trading.otp import *
 import socket
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import update_session_auth_hash
+from django.utils import timezone
 
 def login_view(request):
     if request.method == "POST":
@@ -71,32 +74,58 @@ def register_view(request):
     return render(request, "register.html")
 
 
+@login_required(login_url='login')  
 def home_view(request):
     all_stock = Stock.objects.filter(volume__isnull=False).exclude(volume=0)
     stocks = Stock.objects.filter(volume__isnull=False).exclude(volume=0)[:12] 
     watch = Stock.objects.order_by('-id').filter(volume__isnull=False).exclude(volume=0)[:8]
-    context={'stocks': stocks,'watchlist':watch,'all':all_stock}
+    context={'stocks': stocks,'watchlist':watch,'all':all_stock}   
     return render(request, 'home.html',context)
 
+
+@login_required(login_url='login')  
 def stocks(request):
     all_stock = Stock.objects.filter(volume__isnull=False).exclude(volume=0)
     context={'stocks':all_stock}
     return render(request,'stocks.html',context)
 
+
+def count_quantity(item):
+    count = 0
+    for i in item:
+        count += i.quantity
+    return count
+
+
+@login_required(login_url='login')  
 def stock_details(request, id):
-    if request.method == 'POST':
-        id = request.POST.get('id')
-        quantity = int(request.POST.get('quantity', 1))  # Ensure quantity is an integer
+    if request.POST and "schedule" in request.POST:
+        id = request.POST.get("id")
+        return redirect('schedule_trade', id=id)
+    if request.POST and "sell" in request.POST:
+        item=UserPortfolio.objects.filter(user=request.user,stock__id=id)
+        quantity = int(request.POST.get("quantity"))
+        available_quantity = count_quantity(item)
+        if item:
+            if quantity > available_quantity:
+                messages.error(request,"You dont have such an amount of stock. Check quantity")
+            else:
+                request.session["sell_id"] = id
+                request.session["sell_quantity"] = quantity
+                return redirect('verify_mpin_sell')
+        else:
+            messages.error(request,"You are not able to sell it. Buy it first")
+        print(available_quantity)
+    if request.method == 'POST' and "buy" in request.POST:
+        id = int(request.POST.get('id'))
+        quantity = int(request.POST.get('quantity', 1)) 
         balance = Wallet.objects.get(user=request.user)
         stock = Stock.objects.get(id=id)
-
+        
         if stock.current_price * quantity <= balance.balance:
-            balance.balance = balance.balance - (stock.current_price * quantity)
-            balance.save()
-            stock.volume = stock.volume-quantity
-            stock.save()
-            UserPortfolio.objects.create(user=request.user,stock=stock,quantity=quantity,buy_price=stock.current_price)
-            return redirect('portfolio')
+            request.session["stock_id"] = id
+            request.session["quantity"] = quantity
+            return redirect('verify_mpin_buy')
         else:
             print("not possible")
             messages.error(request, "Insufficient Balance")
@@ -108,8 +137,12 @@ def stock_details(request, id):
 
 
 
-
+@login_required(login_url='login')  
 def portfolio(request):
+    if request.POST:
+        id = request.POST.get("id")
+        request.session["sell_id"] = id
+        return redirect('')
     balance, _ = Wallet.objects.get_or_create(user=request.user)  
     stocks = UserPortfolio.objects.filter(user=request.user)  
 
@@ -121,7 +154,7 @@ def portfolio(request):
 
 
 
-
+@login_required(login_url='login')  
 def add_funds(request):
     if request.method == "POST":
         valid,_ = UserProfile.objects.get_or_create(user=request.user)
@@ -129,14 +162,16 @@ def add_funds(request):
             return redirect('verify_identity')
         else:
             amount = request.POST.get("amount")
+            card_number= request.POST.get("card_number")
             user_wallet= Wallet.objects.get(user=request.user)
             try:
                 amount = float(amount)
                 if amount > 0:
                     user_wallet.balance += amount
                     user_wallet.save()
+                    Transaction.objects.create(user=request.user,card_number=card_number,amount=amount,transaction_type="DEPOSIT")
                     messages.success(request, f"${amount} added to your wallet!")
-                    return redirect("portfolio")  # Redirect to portfolio page
+                    return redirect("wallet")  # Redirect to portfolio page
                 else:
                     messages.error(request, "Invalid amount entered.")
             except ValueError:
@@ -145,6 +180,7 @@ def add_funds(request):
     return render(request, "add_funds.html")
 
 
+@login_required(login_url='login')  
 def verify_identity(request):
     messages.warning(request, "You are not verified. Verify PAN!")
 
@@ -170,6 +206,7 @@ def verify_identity(request):
     return render(request, "verify_identity.html")
 
 
+@login_required(login_url='login')  
 def varify_otp(request):
     success_message="OTP has been send succesfully"
     messages.success(request,success_message)
@@ -185,6 +222,8 @@ def varify_otp(request):
             profile.phone_number=phone
             profile.is_verified=True
             profile.save()
+            if not profile.is_setMpin:
+                return redirect('addMpinAfterPan')
             return redirect('add_funds')
         if res==-1:
             error_message="OTP Expired"
@@ -203,3 +242,344 @@ def varify_otp(request):
         messages.success(request,"OTP has been send succesfully")
 
     return render(request,'otp.html')
+
+
+@login_required(login_url='login')  
+def wallet(request):
+    balance = Wallet.objects.get(user=request.user)
+    return render(request,'wallet.html',{'balance':balance})
+
+
+@login_required(login_url='login')  
+def transactions(request):
+    transactions=Transaction.objects.filter(user=request.user)
+    context={"transactions":transactions}
+    return render(request,'transaction.html',context)
+
+
+@login_required(login_url='login')  
+def widhraw(request):
+    wallet = Wallet.objects.get(user=request.user)
+    context = {"wallet":wallet}
+    if request.POST:
+        amount = float(request.POST.get("amount", 0))
+        account_number = request.POST.get("account_number")
+        balance = Wallet.objects.get(user=request.user)
+        if amount < 100:
+            messages.error(request, "Minimum amount to be widhrawn is 100.")
+        elif amount > balance.balance:
+            messages.error(request, "Insufficient balance.")
+        elif not account_number:
+            messages.error(request, "Enter a valid account number.")
+        else:
+            request.session["amount"] = amount
+            request.session["account_number"] = account_number
+            return redirect('verify_mpin')
+    return render(request,'widhraw.html',context)
+
+
+
+@login_required(login_url='login')  
+def profile(request):
+    userProfile,_ = UserProfile.objects.get_or_create(user=request.user)
+    wallet,_= Wallet.objects.get_or_create(user=request.user)  # Get wallet balance
+    context = {'user': request.user, 'wallet': wallet,"userprofile":userProfile}
+    return render(request, 'profile.html', context)
+
+
+
+@login_required(login_url='login')  
+def varify_mpin_otp(request):
+    if request.POST:
+        otp=request.POST.get('otp')
+        res=validate_otp(request,otp)
+        if res==1:
+            clear_otp(request)
+            pin = request.session.get("new_mpin")
+            userprofile = UserProfile.objects.get(user=request.user)
+            userprofile.set_mpin(pin)
+            request.session.pop("new_mpin", None)
+            messages.success(request,"MPIN changed successfully")
+            return redirect('profile')
+        if res==-1:
+            error_message="OTP Expired"
+            messages.error(request,error_message)
+        if res==0:
+            error_message="Invalid OTP"
+            messages.error(request,error_message)
+       #resend
+    if request.POST and 'resend' in request.POST:
+        otp=generate_otp()
+        email=request.user.email
+        request.session['otp']=otp
+        request.session['otp_expires'] = (datetime.now() + timedelta(minutes=5)).isoformat()
+        print(otp)
+        send_mpin_email(email,otp)
+        messages.success(request,"OTP has been send succesfully")
+
+    return render(request,'otp.html')
+
+
+
+
+@login_required(login_url='login')  
+def changeMpin(request):
+    status = UserProfile.objects.get(user=request.user)
+    if not status.is_setMpin:
+        return redirect('addMpin')
+    if request.POST:
+        new_mpin = request.POST.get("new_mpin")
+        confirm_mpin = request.POST.get("confirm_mpin")
+        if new_mpin and confirm_mpin and new_mpin == confirm_mpin:
+            request.session["new_mpin"] = new_mpin
+            otp = generate_otp()
+            request.session['otp']=otp
+            request.session['otp_expires'] = (datetime.now() + timedelta(minutes=5)).isoformat()
+            send_mpin_email(request.user.email,otp)
+            return redirect('varify_mpin_otp')
+        else:
+            messages.error(request, 'MPINs do not match. Please try again.')
+    return render(request,'changeMpin.html')
+
+
+@login_required(login_url='login')  
+def addMpin(request):
+    if request.method == 'POST':
+        new_mpin = request.POST.get('new_mpin')
+        confirm_mpin = request.POST.get('confirm_mpin')
+
+        if new_mpin and confirm_mpin and new_mpin == confirm_mpin:
+            userprofile = UserProfile.objects.get(user=request.user)
+            userprofile.set_mpin(new_mpin)
+            userprofile.is_setMpin=True
+            userprofile.save()
+            messages.success(request, 'MPIN set successfully!')
+            return redirect('profile')
+        else:
+            messages.error(request, 'MPINs do not match. Please try again.')
+    return render(request,'add_mpin.html')
+
+
+
+@login_required(login_url='login')  
+def addMpinAfterPan(request):
+    if request.method == 'POST':
+        new_mpin = request.POST.get('new_mpin')
+        confirm_mpin = request.POST.get('confirm_mpin')
+
+        if new_mpin and confirm_mpin and new_mpin == confirm_mpin:
+            userprofile = UserProfile.objects.get(user=request.user)
+            userprofile.set_mpin(new_mpin)
+            userprofile.is_setMpin=True
+            userprofile.save()
+            messages.success(request, 'MPIN set successfully!')
+            return redirect('add_funds')
+        else:
+            messages.error(request, 'MPINs do not match. Please try again.')
+    return render(request,'add_mpin.html')
+
+
+
+
+@login_required(login_url='login')
+def change_password(request):
+    if request.method == "POST":
+        current_password = request.POST.get("current_password")
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if not request.user.check_password(current_password):
+            messages.error(request, "Current password is incorrect.")
+        elif new_password != confirm_password:
+            messages.error(request, "New password and confirmation do not match.")
+        elif len(new_password) < 6:
+            messages.error(request, "Password must be at least 6 characters long.")
+        else:
+            request.user.set_password(new_password)
+            request.user.save()
+            update_session_auth_hash(request, request.user)  
+            messages.success(request, "Password changed successfully!")
+            return redirect('profile')
+
+    return render(request, 'change_password.html')
+
+
+def verify_mpin(request):
+    if request.method == "POST":
+        entered_mpin = request.POST.get("mpin")
+        print(entered_mpin)
+        user_profile = UserProfile.objects.get(user=request.user)
+
+        if user_profile.verify_mpin(entered_mpin):
+            balance = Wallet.objects.get(user=request.user)
+            amount = request.session.get("amount")
+            account_number = request.session.get("account_number")
+            balance.balance = balance.balance-amount
+            balance.save()
+            Transaction.objects.create(user=request.user,card_number=account_number,amount=amount,transaction_type="WITHDRAWAL")
+            request.session.pop("amount", None)
+            request.session.pop("account_number", None)
+            return redirect('wallet')
+           
+        else:
+            messages.error(request, "Invalid MPIN. Please try again.")
+
+    return render(request, 'verify_mpin.html')
+
+
+
+def verify_mpin_buy(request):
+    if request.method == "POST":
+        entered_mpin = request.POST.get("mpin")
+        user_profile = UserProfile.objects.get(user=request.user)
+
+        if user_profile.verify_mpin(entered_mpin):
+            id = request.session.get("stock_id")
+            quantity = int(request.session.get("quantity"))
+            balance = Wallet.objects.get(user=request.user)
+            stock = Stock.objects.get(id=id)
+            balance.balance = balance.balance - (stock.current_price * quantity)
+            balance.save()
+            stock.volume = stock.volume-quantity
+            stock.save()
+            item= UserPortfolio.objects.filter(user=request.user,stock__id=id)
+            if item:
+                for i in item:
+                    i.quantity += quantity
+                    i.buy_price += float(stock.current_price) * quantity
+                    i.save()
+            else:
+                price= stock.current_price * quantity
+                UserPortfolio.objects.create(user=request.user,stock=stock,quantity=quantity,buy_price=price)
+            Trade.objects.create(
+                    user=request.user,
+                    stock=stock,
+                    trade_type="BUY",
+                    quantity=quantity,
+                    price=stock.current_price 
+                )
+            request.session.pop("stock_id", None)
+            request.session.pop("quantity", None)
+            return redirect('portfolio')
+           
+        else:
+            messages.error(request, "Invalid MPIN. Please try again.")
+
+    return render(request, 'verify_mpin.html')
+
+def buy_stock(request):
+    if request.method == 'POST':
+        id = request.POST.get('stock')
+        quantity = int(request.POST.get('quantity', 1))  # Ensure quantity is an integer
+        balance = Wallet.objects.get(user=request.user)
+        stock = Stock.objects.get(id=id)
+
+        if stock.current_price * quantity <= balance.balance:
+            request.session["stock_id"] = id
+            request.session["quantity"] = quantity
+            return redirect('verify_mpin_buy')
+        else:
+            print("not possible")
+            messages.error(request, "Insufficient Balance")
+    return redirect('home')
+
+
+
+def verify_mpin_sell(request):
+    if request.method == "POST":
+        entered_mpin = request.POST.get("mpin")
+        user_profile = UserProfile.objects.get(user=request.user)
+
+        if user_profile.verify_mpin(entered_mpin):
+            id = request.session.get("sell_id")
+            quantity = request.session.get("sell_quantity")
+            item = UserPortfolio.objects.get(user=request.user,stock__id = id)
+            new_quantity = item.quantity - quantity
+            stock = Stock.objects.get(id=item.stock.id)
+            if new_quantity == 0:
+                item.delete()
+                stock.volume += quantity
+                balance = Wallet.objects.get(user=request.user)
+                balance.balance += stock.current_price * quantity
+                balance.save()
+                stock.save()
+                Trade.objects.create(
+                    user=request.user,
+                    stock=stock,
+                    trade_type="SELL",
+                    quantity=quantity,
+                    price=stock.current_price 
+                )
+                request.session.pop("sell_id", None)
+                return redirect('portfolio') 
+            else:
+                item.quantity = new_quantity
+                stock.volume += quantity
+                balance = Wallet.objects.get(user=request.user)
+                balance.balance += stock.current_price * quantity
+                balance.save()
+                stock.save()
+                item.save()
+                Trade.objects.create(
+                    user=request.user,
+                    stock=stock,
+                    trade_type="SELL",
+                    quantity=quantity,
+                    price=stock.current_price 
+                )
+                request.session.pop("sell_id", None)
+                return redirect('portfolio')
+        else:
+            messages.error(request, "Invalid MPIN. Please try again.")
+
+    return render(request, 'verify_mpin.html')
+
+
+
+@login_required(login_url='login')
+def schedule_trade(request, id):
+    quantity_item = 0
+    stock = Stock.objects.get(id=id)  # Get stock details
+    item = UserPortfolio.objects.filter(user=request.user, stock__id=id).first()
+    if item:
+        display = True
+        quantity_item = item.quantity
+    else:
+        display = False
+    if request.method == "POST":
+        action = request.POST.get("action")  # Buy or Sell
+        quantity = request.POST.get("quantity")
+        scheduled_time = request.POST.get("scheduled_time")
+        # print(timezone.now())
+        # Validate the input
+        if not action or not quantity or not scheduled_time:
+            messages.error(request, "All fields are required.")
+            return redirect("schedule_trade", id=id)
+
+        try:
+            quantity = int(quantity)
+            scheduled_time = timezone.datetime.strptime(scheduled_time, "%Y-%m-%dT%H:%M")
+        except ValueError:
+            messages.error(request, "Invalid input format.")
+            return redirect("schedule_trade", id=id)
+
+        # Save the scheduled trade
+        ScheduledTrade.objects.create(
+            user=request.user,
+            stock=stock,
+            action=action,
+            quantity=quantity,
+            scheduled_time=scheduled_time,
+        )
+
+        messages.success(request, "Trade scheduled successfully!")
+        return redirect("view_scheduled_trades")
+
+    return render(request, "schedule_trade.html", {"stock": stock,"display":display,"quantity":quantity_item})
+
+
+@login_required(login_url="login")
+def view_scheduled_trades(request):
+    trades = ScheduledTrade.objects.filter(user=request.user).order_by("scheduled_time")
+    return render(request, "view_scheduled_trades.html", {"trades": trades})
+

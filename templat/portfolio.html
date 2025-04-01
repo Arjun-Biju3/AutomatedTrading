@@ -11,17 +11,50 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="{% static 'css/portfolio.css' %}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .sell-btn{
+            width: 100%;
+        }
+        .toggle-btn {
+            padding: 8px 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-left: 10px;
+            width: 180px;
+            height: 50px;
+        }
+        .toggle-btn:hover {
+            background-color: #0056b3;
+        }
+        #scheduled-trades {
+            display: none; /* Initially hidden */
+            margin-top: 20px;
+        }
+        .wallet-section {
+            display: flex;
+            align-items: center;
+        }
+    </style>
 </head>
 <body>
 
     <!-- Main Content Container -->
     <div class="container">
         <!-- Wallet Section -->
-        <div class="wallet-section">
-            <div class="wallet-balance">Wallet Balance: <span id="walletBalance">{{ balance }}</span></div>
-            <div class="add-balance">
-                <a href="{% url 'add_funds' %}"><button>Add Funds</button></a>
-            </div>
+        <div class="wallet-section">             
+            <div class="wallet-balance">
+                <i class="fas fa-purse"></i> <span id="walletBalance">Wallet Balance: {{ balance }}</span>
+            </div>             
+            <div class="add-balance">                 
+                <a href="{% url 'wallet' %}">
+                    <button><i class="fas fa-wallet"></i></button>
+                </a>             
+            </div>   
+            <!-- View Scheduled Trades Button -->
+            <a href="{% url 'view_scheduled_trades' %}"><button class="toggle-btn" onclick="">Scheduled Trades</button> </a>     
         </div>
 
         <!-- Portfolio Table -->
@@ -30,8 +63,7 @@
                 <tr>
                     <th>Stock</th>
                     <th>Shares</th>
-                    <th>Buy Price</th>
-                    <th>Current Price</th>
+                    <th>Current Price (Per Stock)</th>
                     <th>Total Value</th>
                 </tr>
             </thead>
@@ -41,9 +73,8 @@
                     <tr>
                         <td>{{ stock.stock.name }}</td>
                         <td>{{ stock.quantity }}</td>
-                        <td>{{ stock.buy_price }}</td>
                         <td>{{ stock.stock.current_price }}</td>
-                        <td>{{ stock.quantity|multiply:stock.buy_price|floatformat:2 }}</td>
+                        <td>{{ stock.quantity|multiply:stock.stock.current_price|floatformat:2 }}</td>
                     </tr>
                     {% endfor %}
                 {% else %}
@@ -53,10 +84,10 @@
                 {% endif %}
             </tbody>
         </table>
+
     </div>
 
     <script src="{% static 'js/portfolio.js' %}"></script>
-
 </body>
 </html>
 

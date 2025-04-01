@@ -1,0 +1,118 @@
+{% extends 'blank_layout.html' %}
+{% block content %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <style>
+        .profile-container {
+            max-width: 400px;
+            margin: auto;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.15);
+            background-color: #fff;
+            transition: 0.3s;
+        }
+        .profile-container:hover {
+            box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.2);
+        }
+        .profile-title {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .profile-info {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #444;
+        }
+        .wallet-balance {
+            font-size: 20px;
+            font-weight: bold;
+            color: green;
+            margin-bottom: 15px;
+        }
+        .verify-btn, .change-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: 0.3s;
+            border: none;
+        }
+        .verify-btn:hover, .change-btn:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        .verified {
+            color: green;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .logout-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 20px;
+            background-color: #f44336;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .logout-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="profile-container">
+        <h2 class="profile-title">User Profile</h2>
+        <p class="profile-info"><strong>Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+        <p class="profile-info"><strong>Email:</strong> {{ user.email }}</p>
+        <p class="profile-info"><strong>Phone:</strong> {{ userprofile.phone_number }}</p>
+
+        <p class="profile-info">
+            <strong>PAN Number:</strong>
+            {% if userprofile.is_verified %}
+                {{ userprofile.pan_number }} <span class="verified">✔️</span>
+            {% else %}
+                <a href="{% url 'verify_identity' %}" class="verify-btn">Verify PAN</a>
+            {% endif %}
+        </p>
+
+        <p class="wallet-balance">Wallet Balance: ₹{{ wallet.balance }}</p>
+
+        <div class="btn-container">
+            <a href="{% url 'change_password' %}" class="change-btn">Change Password</a>
+            <a href="{% url 'changeMpin' %}" class="change-btn">Change MPIN</a>
+        </div>
+    </div>
+
+</body>
+</html>
+
+{% endblock content %}

@@ -1,0 +1,89 @@
+{% extends 'blank_layout.html' %}
+{% block content %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History</title>
+    <link rel="stylesheet" href="{% static 'css/transactions.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .transaction-container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        .transaction-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .transaction-list {
+            list-style: none;
+            padding: 0;
+        }
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .transaction-item span {
+            font-size: 16px;
+        }
+        .amount {
+            font-weight: bold;
+        }
+        .credit {
+            color: green;
+        }
+        .debit {
+            color: red;
+        }
+        .back-btn {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .back-btn:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="transaction-container">
+        <h2 class="transaction-title">Transaction History</h2>
+        <ul class="transaction-list">
+            {% for transaction in transactions %}
+                <li class="transaction-item">
+                    <span>{{ transaction.timestamp|date:"d M Y, H:i" }}</span>
+                    <span>{{ transaction.description }}</span>
+                    <span class="amount {% if transaction.transaction_type == 'DEPOSIT' %}credit{% else %}debit{% endif %}">
+                        ₹{{ transaction.amount }}
+                    </span>
+                    
+                </li>
+            {% empty %}
+                <li class="transaction-item">No transactions found.</li>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'wallet' %}" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Wallet</a>
+    </div>
+
+</body>
+</html>
+
+{% endblock content %}

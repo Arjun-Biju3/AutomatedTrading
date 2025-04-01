@@ -1,0 +1,81 @@
+{% extends 'blank_layout.html' %}
+{% block content %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wallet</title>
+    <link rel="stylesheet" href="{% static 'css/wallet.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .wallet-container {
+            max-width: 500px;
+            margin: auto;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        .wallet-icon {
+            font-size: 50px;
+            color: #4CAF50;
+        }
+        .balance {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .wallet-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .add-money {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .withdraw-money {
+            background-color: #f44336;
+            color: white;
+        }
+        .transactions {
+            background-color: #007bff;
+            color: white;
+        }
+        .wallet-btn:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wallet-container">
+        <i class="fas fa-wallet wallet-icon"></i>
+        <p class="balance">Balance: ₹<span id="walletBalance">{{ balance.balance }}</span></p>
+
+        <div class="btn-container">
+            <a href="{% url 'add_funds' %}" class="wallet-btn add-money"><i class="fas fa-plus-circle"></i> Add Money</a>
+            <a href="{% url 'widhraw' %}" class="wallet-btn withdraw-money"><i class="fas fa-minus-circle"></i> Withdraw Money</a>
+            <a href="{% url 'transactions' %}" class="wallet-btn transactions"><i class="fas fa-list"></i> View Transactions</a>
+        </div>
+    </div>
+
+</body>
+</html>
+
+{% endblock content %}

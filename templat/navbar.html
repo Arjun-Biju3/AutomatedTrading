@@ -1,6 +1,6 @@
 {% load static %}
 <div class="header">
-    <h1>TradeWave <span>AI</span></h1>
+    <h1>TradeWave</h1>
     <div class="header-right">
         <nav class="nav-links">
             <a href="{% url 'home' %}"><p class="nav-item">HOME</p></a>
@@ -12,7 +12,7 @@
             <div class="dropdown-menu" id="dropdown-menu">
                 <a href="{% url 'logout' %}">Logout</a>
                 <hr>
-                <a href="#">Profile</a>
+                <a href="{% url 'profile' %}">Profile</a>
             </div>
         </div>
     </div>

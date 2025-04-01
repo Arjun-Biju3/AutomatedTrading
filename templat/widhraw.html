@@ -1,0 +1,75 @@
+{% extends 'blank_layout.html' %}
+{% block content %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdraw Money</title>
+    <link rel="stylesheet" href="{% static 'css/wallet.css' %}">
+    <style>
+        .withdraw-container {
+            max-width: 400px;
+            margin: auto;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        .withdraw-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .withdraw-form input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .withdraw-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .withdraw-btn:hover {
+            opacity: 0.8;
+        }
+        .back-btn {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+  
+    <div class="withdraw-container">
+        <h2 class="withdraw-title">Withdraw Money</h2>
+        <p>Available Balance: ₹{{ wallet.balance }}</p>
+
+        <form method="POST" class="withdraw-form">
+            {% csrf_token %}
+            <input type="number" name="amount" placeholder="Enter amount" step="0.01" min="100" max="{{wallet.balance}}" required>
+            <input type="text" name="account_number" placeholder="Enter Account Number" required>
+            <button type="submit" class="withdraw-btn">Withdraw</button>
+        </form>
+
+        <a href="{% url 'wallet' %}" class="back-btn">Back to Wallet</a>
+    </div>
+
+</body>
+</html>
+
+{% endblock content %}

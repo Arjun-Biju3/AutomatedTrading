@@ -11,7 +11,7 @@ def generate_otp(length=6):
 
 def send_email(to,otp):
     msg=EmailMessage()
-    subject="Register"
+    subject="VERIFY PAN"
     body = f"Your OTP for PAN verification is {otp}. Use this OTP to validate your PAN. Do not share it with anyone."
     msg.set_content(body)
     msg['subject'] = subject
@@ -85,3 +85,20 @@ def clear_otp(request):
         del request.session['otp_expires']
     return HttpResponse("OTP cleared")
 
+
+def send_mpin_email(to,otp):
+    msg=EmailMessage()
+    subject="Reset MPIN"
+    body = f"Your OTP for changing MPIN is {otp}. Use this OTP to change your MPIN. Do not share it with anyone."
+    msg.set_content(body)
+    msg['subject'] = subject
+    msg['to'] = to
+    user="ivpe68030@gmail.com"
+    msg['from']=user
+    password="utba gpfp sfgt lagn"
+     
+    server=smtplib.SMTP("smtp.gmail.com",587)
+    server.starttls()
+    server.login(user,password)
+    server.send_message(msg)
+    server.quit()
