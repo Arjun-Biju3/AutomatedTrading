@@ -1,20 +1,26 @@
 import random
 from apscheduler.schedulers.background import BackgroundScheduler
-from django.utils.timezone import now
+from django.utils import timezone
 from django.db import transaction
 from decimal import Decimal  # Import Decimal from the decimal module
 from .models import ScheduledTrade, Stock, Wallet, UserPortfolio, Trade
 from datetime import datetime, timedelta
+import pytz
 
 # Global scheduler instance
 scheduler = BackgroundScheduler()
 
 def execute_scheduled_trades():
     """ Executes scheduled trades if the time has arrived and updates their status """
-    now = datetime.now()
-    scheduled_trades = ScheduledTrade.objects.filter(scheduled_time__lte=now, executed=False)
-    # print("now:",now)
-    
+    current_time = timezone.now().astimezone(pytz.timezone('Asia/Kolkata'))  # ✅ Convert to India time
+    print("Current Time:", current_time.strftime("%H:%M"))
+    # Filter trades where only hour and minute match, ignoring the date
+    scheduled_trades = ScheduledTrade.objects.filter(
+        executed=False,
+        scheduled_time__hour=current_time.hour,
+        scheduled_time__minute=current_time.minute
+    )
+    print(scheduled_trades)
     for trade in scheduled_trades:
         with transaction.atomic():  # Wrap the trade logic in a transaction block
             stock = trade.stock
@@ -22,7 +28,6 @@ def execute_scheduled_trades():
             
             # Perform Buy action
             if trade.action == 'BUY':
-                # Convert stock price and balance to Decimal for precise arithmetic
                 if Decimal(stock.current_price) * Decimal(trade.quantity) <= Decimal(balance.balance):
                     balance.balance -= Decimal(stock.current_price) * Decimal(trade.quantity)
                     stock.volume -= trade.quantity
@@ -70,8 +75,10 @@ def execute_scheduled_trades():
                     )
 
             # Mark the trade as executed
-            trade.executed = True
+            trade.buy_price="add current price of stock"
+            trade.executed = True  # ✅ Ensuring executed items are marked as True
             trade.save()
+    
     print("✅ Scheduled trades executed successfully.")
 
 def start_automated_trading():

@@ -96,6 +96,7 @@ class ScheduledTrade(models.Model):
     action = models.CharField(max_length=4, choices=ACTION_CHOICES)
     quantity = models.PositiveIntegerField()
     scheduled_time = models.DateTimeField()
+    buy_price = models.FloatField(default=0)
     executed = models.BooleanField(default=False)  # To check if the trade was executed
 
     def __str__(self):
