@@ -68,7 +68,7 @@ def register_view(request):
             last_name=last_name
         )
         user.save()
-
+        Wallet.objects.create(user=user)
         messages.success(request, "Registration successful! You can now log in.")
         return redirect("login") 
 
@@ -225,7 +225,7 @@ def varify_otp(request):
             clear_otp(request)
             pan=request.session.get('pan_number')
             phone=request.session.get('phone_number')
-            profile=UserProfile.objects.get(user=request.user)
+            profile,_=UserProfile.objects.get_or_create(user=request.user)
             profile.pan_number=pan
             profile.phone_number=phone
             profile.is_verified=True
@@ -564,7 +564,11 @@ def verify_mpin_sell(request):
 def verify_mpin_schedule(request):
     if request.method == "POST":
         entered_mpin = request.POST.get("mpin")
-        user_profile = UserProfile.objects.get(user=request.user)
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            return redirect('verify_identity')
+        
 
         if user_profile.verify_mpin(entered_mpin):
             id = request.session.get("schedule_id")
