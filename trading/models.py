@@ -35,7 +35,7 @@ class Trade(models.Model):
 
 class Wallet(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    balance = models.IntegerField(default=0)
+    balance = models.FloatField(default=0.0)
     
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -93,11 +93,12 @@ class ScheduledTrade(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     stock = models.ForeignKey('Stock', on_delete=models.CASCADE)
-    action = models.CharField(max_length=4, choices=ACTION_CHOICES)
+    action = models.CharField(max_length=8, choices=ACTION_CHOICES)
     quantity = models.PositiveIntegerField()
     scheduled_time = models.DateTimeField()
     buy_price = models.FloatField(default=0)
     executed = models.BooleanField(default=False)  # To check if the trade was executed
+    failed =models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user} - {self.stock.symbol} - {self.action} at {self.scheduled_time}"

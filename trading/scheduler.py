@@ -42,6 +42,6 @@ def update_stock_prices():
 def start_scheduler():
     """ Start the scheduler if not already running """
     if not scheduler.running:
-        scheduler.add_job(update_stock_prices, 'interval', minutes=5)
+        scheduler.add_job(update_stock_prices, 'interval', minutes=10)
         scheduler.start()
         logger.info("✅ Scheduler started successfully!")

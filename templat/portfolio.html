@@ -46,7 +46,7 @@
         <!-- Wallet Section -->
         <div class="wallet-section">             
             <div class="wallet-balance">
-                <i class="fas fa-purse"></i> <span id="walletBalance">Wallet Balance: {{ balance }}</span>
+                <i class="fas fa-purse"></i> <span id="walletBalance">Wallet Balance: {{ balance|floatformat:2 }}</span>
             </div>             
             <div class="add-balance">                 
                 <a href="{% url 'wallet' %}">
@@ -55,6 +55,7 @@
             </div>   
             <!-- View Scheduled Trades Button -->
             <a href="{% url 'view_scheduled_trades' %}"><button class="toggle-btn" onclick="">Scheduled Trades</button> </a>     
+            <a href="{% url 'trading_history' %}"><button class="toggle-btn" onclick="">History</button> </a>     
         </div>
 
         <!-- Portfolio Table -->

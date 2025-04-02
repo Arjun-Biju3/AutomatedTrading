@@ -1,6 +1,14 @@
 {% extends 'blank_layout.html' %}
 {% block content %}
 {% load static %}
+{% if messages and token %}
+    <script>
+        {% for message in messages %}   
+            alert("{{ message }}");
+        {% endfor %}
+    </script>
+{% endif %}
+
 <div class="container">
       
     <div class="market-summary">
@@ -102,7 +110,7 @@
         
             <div class="buy-sell">
                 <button type="submit" name="buy" class="buy-btn"><i class="fas fa-shopping-cart"></i> Buy</button>
-                <button  class="sech-btn"><i class=""></i> Schedule</button>
+                <button type="submit" name="schedule"  class="sech-btn"><i class=""></i> Schedule</button>
             </div>
         </form>
         </div>

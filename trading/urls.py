@@ -27,5 +27,9 @@ urlpatterns = [
     path('buy_stock/',views.buy_stock,name='buy_stock'),
     path('verify_mpin_sell/',views.verify_mpin_sell,name='verify_mpin_sell'),
     path('schedule_trade/<id>',views.schedule_trade,name='schedule_trade'),
-    path('view_scheduled_trades/',views.view_scheduled_trades,name='view_scheduled_trades')
+    path('view_scheduled_trades/',views.view_scheduled_trades,name='view_scheduled_trades'),
+    path('verify_mpin_schedule/',views.verify_mpin_schedule,name='verify_mpin_schedule'),
+    path('forgot_password/',views.forgot_password,name='forgot_password'),
+    path('request_password_reset/',views.request_password_reset,name='request_password_reset'),
+    path('trading_history/',views.trading_history,name='trading_history')
 ]

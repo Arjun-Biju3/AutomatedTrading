@@ -52,6 +52,12 @@
         font-weight: bold;
     }
 
+    .status-failed {
+        color: #e74c3c; 
+        font-weight: bold;
+    }
+    
+
     .no-trades {
         color: #777;
         font-size: 18px;
@@ -85,6 +91,7 @@
                 <th>Stock</th>
                 <th>Action</th>
                 <th>Quantity</th>
+                <th>Price</th>            
                 <th>Scheduled Time</th>
                 <th>Status</th>
             </tr>
@@ -95,10 +102,23 @@
                 <td>{{ trade.stock.name }}</td>
                 <td>{{ trade.action }}</td>
                 <td>{{ trade.quantity }}</td>
+                <td>{{ trade.buy_price }}</td>
                 <td>{{ trade.scheduled_time }}</td>
-                <td class="{% if trade.executed %}status-executed{% else %}status-pending{% endif %}">
-                    {% if trade.executed %}✔ Executed{% else %}⏳ Pending{% endif %}
+                <td class="{% if trade.failed %}status-failed{% elif trade.executed %}status-executed{% else %}status-pending{% endif %}">
+                    {% if trade.executed %}
+                    {% if trade.failed %}
+                    ❌ Failed
+                    {% else %}
+                    ✔ Executed
+                    {% endif %}
+                        
+                    {% endif %}
+                    
+                    {% if not trade.executed %}
+                        ⏳ Pending
+                    {% endif %}
                 </td>
+                               
             </tr>
             {% endfor %}
         </tbody>
