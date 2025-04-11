@@ -686,3 +686,11 @@ def request_password_reset(request):
 def trading_history(request):
     trades = Trade.objects.filter(user=request.user).order_by("-timestamp")  # Show latest first
     return render(request, "trading_history.html", {"trades": trades})
+
+
+def delete_schedule(request):
+    if request.POST:
+        id = request.POST.get("id")
+        data=ScheduledTrade.objects.get(id=id)
+        data.delete()
+    return redirect('view_scheduled_trades')

@@ -31,5 +31,6 @@ urlpatterns = [
     path('verify_mpin_schedule/',views.verify_mpin_schedule,name='verify_mpin_schedule'),
     path('forgot_password/',views.forgot_password,name='forgot_password'),
     path('request_password_reset/',views.request_password_reset,name='request_password_reset'),
-    path('trading_history/',views.trading_history,name='trading_history')
+    path('trading_history/',views.trading_history,name='trading_history'),
+    path('delete_schedule/',views.delete_schedule,name='delete_schedule')
 ]

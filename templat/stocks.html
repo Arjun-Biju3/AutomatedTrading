@@ -36,7 +36,7 @@
                            <a href="{% url 'stock_details' stock.id  %}">{{ stock.name }}</a>
                         </td>
                         <td>{{ stock.symbol }}</td>
-                        <td>${{ stock.current_price }}</td>
+                        <td>{{ stock.current_price }}</td>
                         <td class="{% if stock.percent_change >= 0 %}positive{% else %}negative{% endif %}">
                             {{ stock.percent_change }}%
                             <i class="fas {% if stock.percent_change >= 0 %}fa-caret-up{% else %}fa-caret-down{% endif %}"></i>

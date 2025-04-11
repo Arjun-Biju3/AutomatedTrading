@@ -15,9 +15,10 @@ def execute_scheduled_trades():
     current_time = timezone.now().astimezone(pytz.timezone('Asia/Kolkata'))  # Convert to India time
     print("Current Time:", current_time.strftime("%H:%M"))
 
-    # Filter trades where only hour and minute match, ignoring the date
+    # Filter trades where date, hour, and minute match
     scheduled_trades = ScheduledTrade.objects.filter(
         executed=False,
+        scheduled_time__date=current_time.date(),  # Ensure it's scheduled for today
         scheduled_time__hour=current_time.hour,
         scheduled_time__minute=current_time.minute
     )

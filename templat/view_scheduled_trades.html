@@ -79,6 +79,16 @@
     .back-link:hover {
         background: #0056b3;
     }
+    .delete-btn{
+    background-color: #dc3545;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    }
 </style>
 
 <div class="scheduled-trades-container">
@@ -94,6 +104,7 @@
                 <th>Price</th>            
                 <th>Scheduled Time</th>
                 <th>Status</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -118,7 +129,17 @@
                         ⏳ Pending
                     {% endif %}
                 </td>
-                               
+                    <td>
+                        {% if trade.executed %}
+                        <p>Not Applicable</p>
+                        {% else %}
+                        <form action="{% url 'delete_schedule' %}" method="post">
+                            {% csrf_token %}
+                            <input type="text" name="id" value={{trade.id}} hidden>
+                            <button class="delete-btn" type="submit">DELETE</button>
+                        </form>
+                        {% endif %}
+                    </td>           
             </tr>
             {% endfor %}
         </tbody>
